@@ -3,15 +3,15 @@
 
 ## Write a short comment describing this function
 ## This function creates a special "matrix" object that can cache its inverse
-makeCacheMatrix <- function(x = matrix()) {
-  m <- NULL
+makeCacheMatrix <- function(inputMatrix = matrix()) {
+  inverseMatrix <- NULL
   set <- function(y) {
-    x <<- y
-    m <<- NULL
+    inputMatrix <<- y
+    inverseMatrix <<- NULL
   }
-  get <- function() x
-  setinverse <- function(inverse) m <<- solve
-  getinverse <- function() m
+  get <- function() inputMatrix
+  setinverse <- function(solve) inverseMatrix <<- solve
+  getinverse <- function() inverseMatrix
   list(set = set, get = get,
        setinverse = setinverse,
        getinverse = getinverse)
@@ -23,15 +23,32 @@ makeCacheMatrix <- function(x = matrix()) {
 ## returned by makeCacheMatrix above. If the inverse has already been 
 ## calculated (and the matrix has not changed), then the cachesolve 
 ## should retrieve the inverse from the cache
-cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
-    m <- x$getinverse()
-    if(!is.null(m)) {
+cacheSolve <- function(inputMatrix, ...) {
+    ## Return a matrix that is the inverse of 'inputMatrix'
+    inverseMatrix <- inputMatrix$getinverse()
+    if(!is.null(inverseMatrix)) {
       message("getting cached data")
-      return(m)
+      return(inverseMatrix)
     }
-    data <- x$get()
-    m <- solve(data, ...)
-    x$setinverse(m)
-    m
+    data <- inputMatrix$get()
+    inverseMatrix <- solve(data, ...)
+    inputMatrix$setinverse(inverseMatrix)
+    inverseMatrix
 }
+
+
+## Example:  How to run this do following
+
+A = matrix( 
+   c(2, 4, 3, 1), # the data elements 
+   nrow=2,              # number of rows 
+   ncol=2,              # number of columns 
+   byrow = TRUE)        # fill matrix by rows 
+
+c <- makeCacheMatrix(A)
+
+#first time calling cacheSolve will cache the inverse and return the inverse
+cacheSolve(c)
+
+#subsequent time call to cacheSolve will return the cached data
+cacheSolve(c)
